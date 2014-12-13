@@ -57,21 +57,20 @@ automatically insert new list items.
 - Pressing Return at the end of a list item inserts a new list item.
 - Pressing Return at the end of a checkbox inserts a new checkbox.
 - Pressing return at the beginning of an empty list or checkbox item
-  outdents the item, or clears it if it's already at the outer-most
+  outdents the item, or clears it if it's already at the outermost
   indentation level."
-  (interactive "P")
   ;; We should only invoke our custom logic if we're in a list item.
   (if (org-at-item-p)
       ;; If we're at the beginning of an empty list item, then try to outdent
-      ;; it. If it can't be outdented (primarily b/c it's already at the
-      ;; outer-most indentation level), then delete it.
+      ;; it. If it can't be outdented (b/c it's already at the outermost
+      ;; indentation level), then delete it.
       (if (and (eolp) (<= (point) (org-beginning-of-item-after-bullet)))
           (condition-case nil
               (call-interactively 'org-outdent-item)
             ('error (delete-region (line-beginning-position) (line-end-position))))
 
-        ;; Otherwise, we should insert the correct list item depending on
-        ;; whether we're on a checkbox.
+        ;; Now we can insert a new list item. Insert a checkbox if we're on a
+        ;; checkbox item, otherwise let org-mode figure it out.
         (if (org-at-item-checkbox-p)
             (org-insert-todo-heading nil)
           (org-meta-return)))
@@ -79,13 +78,12 @@ automatically insert new list items.
 
 (defun org-autolist-delete-backward-char-advise (orig-fun &rest args)
   "Wraps the org-delete-backward-char function to allow the Backspace
-key to automatically delete list bullets.
+key to automatically delete list prefixes.
 
-- Pressing backspace at the beginning of a list item deletes to
-  the previous line.
-- If the previous line is blank, then we delete the previous line
-  instead, thus moving the current list item up one line."
-  (interactive "p")
+- Pressing backspace at the beginning of a list item deletes it and
+  moves the cursor to the previous line.
+- If the previous line is blank, then delete the previous line, and
+  move the current list item up one line."
   ;; We should only invoke our custom logic if we're at the beginning of a list
   ;; item right after the bullet character.
   (if (and (org-at-item-p) (<= (point) (org-beginning-of-item-after-bullet)))

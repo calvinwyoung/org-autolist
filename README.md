@@ -13,7 +13,7 @@
 
 When editing lists, pressing the "Return" key will insert a new list item automatically. This works for both bullet points and checkboxes, so there's no need to think about which key combination to use (i.e., `M-<return>` vs. `M-S-<return>`). Additionally, pressing "Backspace" at the beginning of a list item deletes the bullet point (or checkbox), and moves the cursor to the end of the previous line.
 
-The easiest way to illustrate this functionality is with a few examples. Here, we'll use the `|` character to indicate the cursor position. 
+The easiest way to illustrate this functionality is with a few examples. Here, we'll use the `|` character to indicate the cursor position.
 
 ### Inserting list items
 
@@ -43,7 +43,7 @@ Pressing "Return" again will result in:
 - |
 ```
 
-And pressing "Return" one last time will result in:
+And pressing "Return" a final time will result in:
 
 ```
 - one
