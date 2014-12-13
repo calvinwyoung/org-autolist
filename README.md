@@ -1,3 +1,5 @@
+## Summary
+
 **org-autolist** aims to make editing org-mode lists more similar to editing lists in non-programming editors like Google Docs, MS Word, and OS X Notes.
 
 ## Setup
