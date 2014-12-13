@@ -45,7 +45,7 @@
 (require 'org)
 (require 'org-element)
 
-(defun org-beginning-of-item-after-bullet ()
+(defun org-autolist-beginning-of-item-after-bullet ()
   "Returns the position before the first character after the
 bullet of the current list item"
   (org-element-property :contents-begin (org-element-at-point)))
@@ -64,10 +64,12 @@ automatically insert new list items.
       ;; If we're at the beginning of an empty list item, then try to outdent
       ;; it. If it can't be outdented (b/c it's already at the outermost
       ;; indentation level), then delete it.
-      (if (and (eolp) (<= (point) (org-beginning-of-item-after-bullet)))
+      (if (and (eolp)
+               (<= (point) (org-autolist-beginning-of-item-after-bullet)))
           (condition-case nil
               (call-interactively 'org-outdent-item)
-            ('error (delete-region (line-beginning-position) (line-end-position))))
+            ('error (delete-region (line-beginning-position)
+                                   (line-end-position))))
 
         ;; Now we can insert a new list item. Insert a checkbox if we're on a
         ;; checkbox item, otherwise let org-mode figure it out.
@@ -86,7 +88,8 @@ key to automatically delete list prefixes.
   move the current list item up one line."
   ;; We should only invoke our custom logic if we're at the beginning of a list
   ;; item right after the bullet character.
-  (if (and (org-at-item-p) (<= (point) (org-beginning-of-item-after-bullet)))
+  (if (and (org-at-item-p)
+           (<= (point) (org-autolist-beginning-of-item-after-bullet)))
       ;; If the previous line is empty, then just delete the previous line (i.e.,
       ;; shift the list up by one line).
       (if (org-previous-line-empty-p)
@@ -100,7 +103,7 @@ key to automatically delete list prefixes.
           ;; the point after the bullet. This handles the case when the cursor
           ;; is in the middle of a checkbox.
           (if (not (eolp))
-              (goto-char (org-beginning-of-item-after-bullet)))
+              (goto-char (org-autolist-beginning-of-item-after-bullet)))
 
           ;; For most lines, we want to delete from bullet point to the end of
           ;; the previous line. But if we're on the first line in the buffer,
@@ -127,7 +130,8 @@ key to automatically delete list prefixes.
    (t
     (message "Disabling auto-list-mode!")
     (advice-remove 'org-return #'org-autolist-return-advise)
-    (advice-remove 'org-delete-backward-char #'org-autolist-delete-backward-char-advise))))
+    (advice-remove 'org-delete-backward-char
+                   #'org-autolist-delete-backward-char-advise))))
 
 (provide 'org-autolist)
 ;;; org-autolist.el ends here
