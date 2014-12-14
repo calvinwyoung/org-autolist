@@ -1,19 +1,38 @@
 ## Summary
 
-**org-autolist** aims to make editing org-mode lists more similar to editing lists in non-programming editors like Google Docs, MS Word, and OS X Notes.
+**org-autolist** aims to make editing org-mode lists more like editing lists in traditional non-programming editors such as Google Docs, MS Word, and OS X Notes.
 
-## Setup
+When editing a list item, pressing "Return" will insert a new list item automatically. This works for both bullet points and checkboxes, so there's no need to think about whether to use `M-<return>` or `M-S-<return>`. Similarly, pressing "Backspace" at the beginning of a list item deletes the bullet / checkbox, and moves the cursor to the end of the previous line.
 
-```el
-(require 'org-autolist)
-(add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
-```
+## Installation
+
+The recommended way to install  org-autolist is via `package.el`.
+
+### MELPA Stable
+
+The latest stable version can be found in the [MELPA Stable](http://stable.melpa.org/#/org-autolist) repository.
+
+### MELPA
+
+If you'd like the latest (potentially unstable) version, you can also install org-autolist from the normal [MELPA](http://melpa.org/#/org-autolist) repository.
 
 ## Usage
 
-When editing lists, pressing the "Return" key will insert a new list item automatically. This works for both bullet points and checkboxes, so there's no need to think about which key combination to use (i.e., `M-<return>` vs. `M-S-<return>`). Additionally, pressing "Backspace" at the beginning of a list item deletes the bullet point (or checkbox), and moves the cursor to the end of the previous line.
+To enable org-autolist mode in the current buffer:
 
-The easiest way to illustrate this functionality is with a few examples. Here, we'll use the `|` character to indicate the cursor position.
+```el
+(org-autolist-mode)
+```
+
+To enable it whenever you open an org file, add this to your `init.el`:
+
+```
+(add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
+```
+
+## Examples
+
+The easiest way to illustrate org-autolist's functionality is with a few examples. Here, we'll use the `|` character to indicate the cursor position.
 
 ### Inserting list items
 
