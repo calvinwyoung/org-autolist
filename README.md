@@ -1,6 +1,6 @@
 ## Summary
 
-**org-autolist** aims to make editing org-mode lists more like editing lists in traditional non-programming editors such as Google Docs, MS Word, and OS X Notes.
+**org-autolist** makes org-mode lists behave more like lists in non-programming editors such as Google Docs, MS Word, and OS X Notes.
 
 When editing a list item, pressing "Return" will insert a new list item automatically. This works for both bullet points and checkboxes, so there's no need to think about whether to use `M-<return>` or `M-S-<return>`. Similarly, pressing "Backspace" at the beginning of a list item deletes the bullet / checkbox, and moves the cursor to the end of the previous line.
 
@@ -14,7 +14,7 @@ The latest stable version can be found in the [MELPA Stable](http://stable.melpa
 
 ### MELPA
 
-If you'd like the latest (potentially unstable) version, you can also install org-autolist from the normal [MELPA](http://melpa.org/#/org-autolist) repository.
+If you'd like the latest, potentially unstable version, you can also install org-autolist from the normal [MELPA](http://melpa.org/#/org-autolist) repository.
 
 ## Usage
 
