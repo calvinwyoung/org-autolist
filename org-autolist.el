@@ -26,20 +26,24 @@
 
 ;;; Commentary:
 
-;; Improved list management in org-mode
+;; `org-autolist` makes org-mode lists behave more like lists in non-programming
+;; editors such as Google Docs, MS Word, and OS X Notes.
 ;;
-;; This package makes editing org-mode lists more like editing lists in
-;; traditional non-programming editors like Google Docs, MS Word, and OS X
-;; Notes. Pressing "Return" in a list item now inserts a new list item
+;; When editing a list item, pressing "Return" will insert a new list item
 ;; automatically. This works for both bullet points and checkboxes, so there's
-;; no need to distinguish between using M-<return> or M-S-<return>.
-;; Additionally, pressing "Backspace" at the beginning of a list item deletes
-;; the bullet point and moves focuses to the end of the previous line.
+;; no need to think about whether to use `M-<return>` or `M-S-<return>`. Similarly,
+;; pressing "Backspace" at the beginning of a list item deletes the bullet /
+;; checkbox, and moves the cursor to the end of the previous line.
 
 ;;; Usage:
 
-;; (require 'org-autolist)
-;; (org-autolist-mode)
+;; To enable org-autolist mode in the current buffer:
+;;
+;;   (org-autolist-mode)
+;;
+;; To enable it whenever you open an org file, add this to your init.el:
+;;
+;;   (add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
 
 ;;; Code:
 (require 'org)
@@ -50,7 +54,7 @@
 bullet of the current list item"
   (org-element-property :contents-begin (org-element-at-point)))
 
-(defun org-autolist-return-advise (orig-fun &rest args)
+(defadvice org-return (around org-autolist-return)
   "Wraps the org-return function to allow the Return key to
 automatically insert new list items.
 
@@ -76,9 +80,9 @@ automatically insert new list items.
         (if (org-at-item-checkbox-p)
             (org-insert-todo-heading nil)
           (org-meta-return)))
-    (apply orig-fun args)))
+    ad-do-it))
 
-(defun org-autolist-delete-backward-char-advise (orig-fun &rest args)
+(defadvice org-delete-backward-char (around org-autolist-delete-backward-char)
   "Wraps the org-delete-backward-char function to allow the Backspace
 key to automatically delete list prefixes.
 
@@ -112,7 +116,7 @@ key to automatically delete list prefixes.
               (delete-region (point) (line-beginning-position))
             (delete-region (point) (save-excursion (forward-line -1)
                                                    (line-end-position))))))
-    (apply orig-fun args)))
+    ad-do-it))
 
 ;;;###autoload
 (define-minor-mode org-autolist-mode
@@ -122,16 +126,13 @@ key to automatically delete list prefixes.
    ;; If enabling org-autolist-mode, then add our advice functions.
    (org-autolist-mode
     (message "Enabling auto-list-mode!")
-    (advice-add 'org-return :around #'org-autolist-return-advise)
-    (advice-add 'org-delete-backward-char
-                :around
-                #'org-autolist-delete-backward-char-advise))
+    (ad-activate 'org-return)
+    (ad-activate 'org-delete-backward-char))
    ;; Be sure to clean up after ourselves when org-autolist-mode gets disabled.
    (t
     (message "Disabling auto-list-mode!")
-    (advice-remove 'org-return #'org-autolist-return-advise)
-    (advice-remove 'org-delete-backward-char
-                   #'org-autolist-delete-backward-char-advise))))
+    (ad-deactivate 'org-return)
+    (ad-deactivate 'org-delete-backward-char))))
 
 (provide 'org-autolist)
 ;;; org-autolist.el ends here
