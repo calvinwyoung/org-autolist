@@ -5,7 +5,7 @@
 ;; Author: Calvin Young
 ;; Keywords: lists, checklists, org-mode
 ;; Homepage: https://github.com/calvinwyoung/org-autolist
-;; Version: 0.1
+;; Version: 0.12
 
 ;; This file is not part of GNU Emacs.
 
@@ -34,9 +34,7 @@
 ;; no need to think about whether to use `M-<return>` or `M-S-<return>`. Similarly,
 ;; pressing "Backspace" at the beginning of a list item deletes the bullet /
 ;; checkbox, and moves the cursor to the end of the previous line.
-
-;;; Usage:
-
+;;
 ;; To enable org-autolist mode in the current buffer:
 ;;
 ;;   (org-autolist-mode)
@@ -51,8 +49,24 @@
 
 (defun org-autolist-beginning-of-item-after-bullet ()
   "Returns the position before the first character after the
-bullet of the current list item"
-  (org-element-property :contents-begin (org-element-at-point)))
+bullet of the current list item.
+
+This function uses the same logic as `org-beginning-of-line' when
+`org-special-ctrl-a/e' is enabled"
+  (save-excursion
+    (beginning-of-line 1)
+    (when (looking-at org-list-full-item-re)
+      ;; Find the first white space character after bullet, and check-box, if
+      ;; any. That point should be the return value of this function if found.
+      (let ((box (match-end 3)))
+        (if (not box) (match-end 1)
+          (let ((after (char-after box)))
+            (if (and after (= after ? )) (1+ box) box)))))))
+
+(defun org-autolist-at-empty-item-description-p ()
+  "Is point at an *empty* description list item?"
+  (message "evaluating...")
+  (org-list-at-regexp-after-bullet-p "\\(\\s-*\\)::\\(\\s-*$\\)"))
 
 (defadvice org-return (around org-autolist-return)
   "Wraps the org-return function to allow the Return key to
@@ -75,11 +89,27 @@ automatically insert new list items.
             ('error (delete-region (line-beginning-position)
                                    (line-end-position))))
 
-        ;; Now we can insert a new list item. Insert a checkbox if we're on a
-        ;; checkbox item, otherwise let org-mode figure it out.
-        (if (org-at-item-checkbox-p)
-            (org-insert-todo-heading nil)
-          (org-meta-return)))
+        ;; Now we can insert a new list item. The logic here is a little tricky
+        ;; depending on the type of list we're dealing with.
+        (cond
+         ;; If we're on a checkbox item, then insert a new checkbox
+         ((org-at-item-checkbox-p)
+          (org-insert-todo-heading nil))
+
+         ;; If we're in a description list, and the point is between the start
+         ;; of the list (after the bullet) and the end of the list, then we
+         ;; should simply insert a newline. This is a bit weird and inconsistent
+         ;; w/ the UX for other list types, but we do this b/c `org-meta-return'
+         ;; has some very strange behavior when executed in the middle of a
+         ;; description list.
+         ((and (org-at-item-description-p)
+               (> (point) (org-autolist-beginning-of-item-after-bullet))
+               (< (point) (line-end-position)))
+          (newline))
+
+         ;; Otherwise just let org-mode figure it out it.
+         (t
+          (org-meta-return))))
     ad-do-it))
 
 (defadvice org-delete-backward-char (around org-autolist-delete-backward-char)
@@ -103,19 +133,33 @@ key to automatically delete list prefixes.
 
         ;; Otherwise we should delete to the end of the previous line.
         (progn
-          ;; If we're not already at the end of a line, then we should move to
-          ;; the point after the bullet. This handles the case when the cursor
-          ;; is in the middle of a checkbox.
-          (if (not (eolp))
-              (goto-char (org-autolist-beginning-of-item-after-bullet)))
+          ;; We should ensure that the cursor starts at the point after the
+          ;; bullet. This allows us to delete a full checkbox if the cursor is
+          ;; initially positioned in the middle of the checkbox.
+          (goto-char (org-autolist-beginning-of-item-after-bullet))
 
           ;; For most lines, we want to delete from bullet point to the end of
-          ;; the previous line. But if we're on the first line in the buffer,
-          ;; then we should just delete the bullet point.
-          (if (= 1 (line-number-at-pos))
-              (delete-region (point) (line-beginning-position))
-            (delete-region (point) (save-excursion (forward-line -1)
-                                                   (line-end-position))))))
+          ;; the previous line. There are, however a few exceptions.
+          (cond
+           ;; If we're on the first line in the buffer, then we should just
+           ;; delete the bullet point.n
+           ((= 1 (line-number-at-pos))
+            (delete-region (point) (line-beginning-position)))
+
+           ;; If we're on a line with an empty description list, then
+           ;; we should delete the full line since there's not point leaving it
+           ;; around.
+           ((org-autolist-at-empty-item-description-p)
+            (delete-region (line-end-position)
+                           (save-excursion (forward-line -1)
+                                           (line-end-position))))
+
+           ;; Otherwise we should delete to the end of the previous line by
+           ;; default.
+           (t
+            (delete-region (point)
+                           (save-excursion (forward-line -1)
+                                           (line-end-position)))))))
     ad-do-it))
 
 ;;;###autoload
