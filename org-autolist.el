@@ -165,16 +165,14 @@ key to automatically delete list prefixes.
 ;;;###autoload
 (define-minor-mode org-autolist-mode
   "Enables improved list management in org-mode."
-  nil nil nil
+  nil " AList" nil
   (cond
    ;; If enabling org-autolist-mode, then add our advice functions.
    (org-autolist-mode
-    (message "Enabling auto-list-mode!")
     (ad-activate 'org-return)
     (ad-activate 'org-delete-backward-char))
    ;; Be sure to clean up after ourselves when org-autolist-mode gets disabled.
    (t
-    (message "Disabling auto-list-mode!")
     (ad-deactivate 'org-return)
     (ad-deactivate 'org-delete-backward-char))))
 
