@@ -1,11 +1,11 @@
 ;;; org-autolist.el --- Improved list management in org-mode
 
-;; Copyright (C) 2014 Calvin Young
+;; Copyright (C) 2017 Calvin Young
 
 ;; Author: Calvin Young
 ;; Keywords: lists, checklists, org-mode
 ;; Homepage: https://github.com/calvinwyoung/org-autolist
-;; Version: 0.12
+;; Version: 0.14
 
 ;; This file is not part of GNU Emacs.
 
