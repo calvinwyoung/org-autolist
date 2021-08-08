@@ -81,42 +81,51 @@ automatically insert new list items.
   ;; there is an exception if we're on a URL in a list item, and
   ;; `org-return-follows-link` is enabled -- in this case, we should just let
   ;; org mode default to following the link.
-  (if (and (org-at-item-p)
-           (not
+  (let* ((el (org-element-at-point))
+          (parent (plist-get (cadr el) :parent))
+          ;; handle hard-wrapped list-items
+          (is-listitem (or (org-at-item-p)
+                         (and (eq 'paragraph (car el))
+                           (eq 'item (car parent)))))
+          (is-checkbox (plist-get (cadr parent) :checkbox)))
+    (if (and is-listitem
+          (not
             (and org-return-follows-link
-                 (eq 'org-link (get-text-property (point) 'face)))))
+              (eq 'org-link (get-text-property (point) 'face)))))
       ;; If we're at the beginning of an empty list item, then try to outdent
       ;; it. If it can't be outdented (b/c it's already at the outermost
       ;; indentation level), then delete it.
       (if (and (eolp)
-               (<= (point) (org-autolist-beginning-of-item-after-bullet)))
-          (condition-case nil
-              (call-interactively 'org-outdent-item)
-            ('error (delete-region (line-beginning-position)
-                                   (line-end-position))))
+            ;; need to recheck in case we're at a hard-wrapped list-item
+            (org-at-item-p)
+            (<= (point) (org-autolist-beginning-of-item-after-bullet)))
+        (condition-case nil
+          (call-interactively 'org-outdent-item)
+          ('error (delete-region (line-beginning-position)
+                    (line-end-position))))
 
         ;; Now we can insert a new list item. The logic here is a little tricky
         ;; depending on the type of list we're dealing with.
         (cond
-         ;; If we're on a checkbox item, then insert a new checkbox
-         ((org-at-item-checkbox-p)
-          (org-insert-todo-heading nil))
+          ;; If we're on a checkbox item, then insert a new checkbox
+          (is-checkbox
+            (org-insert-todo-heading nil))
 
-         ;; If we're in a description list, and the point is between the start
-         ;; of the list (after the bullet) and the end of the list, then we
-         ;; should simply insert a newline. This is a bit weird and inconsistent
-         ;; w/ the UX for other list types, but we do this b/c `org-meta-return'
-         ;; has some very strange behavior when executed in the middle of a
-         ;; description list.
-         ((and (org-at-item-description-p)
-               (> (point) (org-autolist-beginning-of-item-after-bullet))
-               (< (point) (line-end-position)))
-          (newline))
+          ;; If we're in a description list, and the point is between the start
+          ;; of the list (after the bullet) and the end of the list, then we
+          ;; should simply insert a newline. This is a bit weird and inconsistent
+          ;; w/ the UX for other list types, but we do this b/c `org-meta-return'
+          ;; has some very strange behavior when executed in the middle of a
+          ;; description list.
+          ((and (org-at-item-description-p)
+             (> (point) (org-autolist-beginning-of-item-after-bullet))
+             (< (point) (line-end-position)))
+            (newline))
 
-         ;; Otherwise just let org-mode figure it out it.
-         (t
-          (org-meta-return))))
-    ad-do-it))
+          ;; Otherwise just let org-mode figure it out it.
+          (t
+            (org-meta-return))))
+      ad-do-it)))
 
 (defadvice org-delete-backward-char (around org-autolist-delete-backward-char)
   "Wraps the org-delete-backward-char function to allow the Backspace
