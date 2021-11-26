@@ -6,7 +6,7 @@ When editing a list item, pressing "Return" will insert a new list item automati
 
 ## Installation
 
-The recommended way to install  org-autolist is via `package.el`.
+The recommended way to install  org-autolist  via `package.el`.
 
 ### MELPA Stable
 
