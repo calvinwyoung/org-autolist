@@ -108,7 +108,7 @@ Then pressing "Backspace" will produce:
 If you want to disable this behavior, add this to your `init.el`:
 
 ```elisp
-(setq org-autolist-enable-delete t)
+(setq org-autolist-enable-delete nil)
 ```
 
 ## Feedback

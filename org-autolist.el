@@ -45,7 +45,7 @@
 ;;
 ;; To disable backspace deleting the whole list item, add this:
 ;;
-;;   (setq org-autolist-enable-delete t)
+;;   (setq org-autolist-enable-delete nil)
 ;;
 
 ;;; Code:
