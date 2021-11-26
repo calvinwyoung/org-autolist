@@ -105,6 +105,12 @@ Then pressing "Backspace" will produce:
 - [ ] two|apple
 ```
 
+If you want to disable this behavior, add this to your `init.el`:
+
+```elisp
+(setq org-autolist-enable-delete t)
+```
+
 ## Feedback
 
 If you find a bug, or have a suggestion for an improvement, then feel free to submit an issue or pull request!
