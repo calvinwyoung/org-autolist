@@ -6,7 +6,7 @@ When editing a list item, pressing "Return" will insert a new list item automati
 
 ## Installation
 
-The recommended way to install  org-autolist is via `package.el`.
+The recommended way to install  org-autolist  via `package.el`.
 
 ### MELPA Stable
 
@@ -103,6 +103,12 @@ Then pressing "Backspace" will produce:
 ```
 - [ ] one
 - [ ] two|apple
+```
+
+If you want to disable this behavior, add this to your `init.el`:
+
+```elisp
+(setq org-autolist-enable-delete t)
 ```
 
 ## Feedback

@@ -42,10 +42,18 @@
 ;; To enable it whenever you open an org file, add this to your init.el:
 ;;
 ;;   (add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
+;;
+;; To disable backspace deleting the whole list item, add this:
+;;
+;;   (setq org-autolist-enable-delete t)
+;;
 
 ;;; Code:
 (require 'org)
 (require 'org-element)
+
+(defvar org-autolist-enable-delete t
+  "Non-nil to allow the Backspace key to automatically delete list prefixes.")
 
 (defun org-autolist-beginning-of-item-after-bullet ()
   "Returns the position before the first character after the
@@ -137,7 +145,8 @@ key to automatically delete list prefixes.
   move the current list item up one line."
   ;; We should only invoke our custom logic if we're at the beginning of a list
   ;; item right after the bullet character.
-  (if (and (org-at-item-p)
+  (if (and org-autolist-enable-delete
+           (org-at-item-p)
            (<= (point) (org-autolist-beginning-of-item-after-bullet)))
       ;; If the previous line is empty, then just delete the previous line (i.e.,
       ;; shift the list up by one line).
