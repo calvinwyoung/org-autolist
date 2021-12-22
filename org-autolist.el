@@ -215,8 +215,9 @@ list prefixes if `org-autolist-enable-delete' is t.
 
 ;;;###autoload
 (define-minor-mode org-autolist-mode
-  nil " Autolist" nil
   "Enables improved list management in `org-mode'."
+  :lighter " Autolist"
+  :keymap nil
   (cond
    ;; If enabling org-autolist-mode, then add our advice functions.
    (org-autolist-mode
