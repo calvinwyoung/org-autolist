@@ -49,11 +49,38 @@
 ;;
 
 ;;; Code:
+
+
+
 (require 'org)
 (require 'org-element)
 
-(defvar org-autolist-enable-delete t
-  "Non-nil to allow the Backspace key to automatically delete list prefixes.")
+(defgroup org-autolist ()
+  "Options for `org-autolist'."
+  :group 'org
+  :prefix "org-autolist-"
+  :tag "Org Autolist")
+
+
+
+;;; Customization variables
+
+(defcustom org-autolist-enable-delete t
+  "Controls auto-deletion of list prefixes when typing e.g. \
+`\\<org-mode-map>\\[delete-backward-char]'.
+
+By default, hitting backspace after a list item prefix will not
+just delete the character, but the whole prefix. In case of
+checkboxes like “- [ ] this”, backward deletion before “this”
+will remove the checkbox and the dash.
+
+Set to nil to disable automatic removal."
+  :type 'boolean
+  :group 'org-autolist)
+
+
+
+;;; Internal Functions
 
 (defun org-autolist-beginning-of-item-after-bullet ()
   "Returns the position before the first character after the
