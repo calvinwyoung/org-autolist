@@ -45,19 +45,45 @@
 ;;
 ;; To disable backspace deleting the whole list item, add this:
 ;;
-;;   (setq org-autolist-enable-delete t)
+;;   (setq org-autolist-enable-delete nil)
 ;;
 
 ;;; Code:
+
+
+
 (require 'org)
 (require 'org-element)
 
-(defvar org-autolist-enable-delete t
-  "Non-nil to allow the Backspace key to automatically delete list prefixes.")
+(defgroup org-autolist ()
+  "Options for `org-autolist'."
+  :group 'org
+  :prefix "org-autolist-"
+  :tag "Org Autolist")
+
+
+
+;;; Customization variables
+
+(defcustom org-autolist-enable-delete t
+  "Controls auto-deletion of list prefixes when typing e.g. \
+`\\<org-mode-map>\\[delete-backward-char]'.
+
+By default, hitting backspace after a list item prefix will not
+just delete the character, but the whole prefix. In case of
+checkboxes like “- [ ] this”, backward deletion before “this”
+will remove the checkbox and the dash.
+
+Set to nil to disable automatic removal."
+  :type 'boolean
+  :group 'org-autolist)
+
+
+
+;;; Internal Functions
 
 (defun org-autolist-beginning-of-item-after-bullet ()
-  "Returns the position before the first character after the
-bullet of the current list item.
+  "Return the position after the bullet of the current list item.
 
 This function uses the same logic as `org-beginning-of-line' when
 `org-special-ctrl-a/e' is enabled"
@@ -77,7 +103,7 @@ This function uses the same logic as `org-beginning-of-line' when
   (org-list-at-regexp-after-bullet-p "\\(\\s-*\\)::\\(\\s-*$\\)"))
 
 (defadvice org-return (around org-autolist-return)
-  "Wraps the org-return function to allow the Return key to
+  "Wraps the `org-return' function to allow the Return key to \
 automatically insert new list items.
 
 - Pressing Return at the end of a list item inserts a new list item.
@@ -136,8 +162,9 @@ automatically insert new list items.
       ad-do-it)))
 
 (defadvice org-delete-backward-char (around org-autolist-delete-backward-char)
-  "Wraps the org-delete-backward-char function to allow the Backspace
-key to automatically delete list prefixes.
+  "Wraps the `org-delete-backward-char' function to allow \
+`\\<org-mode-map>\\[delete-backward-char]' to automatically delete \
+list prefixes if `org-autolist-enable-delete' is t.
 
 - Pressing backspace at the beginning of a list item deletes it and
   moves the cursor to the previous line.
@@ -188,8 +215,9 @@ key to automatically delete list prefixes.
 
 ;;;###autoload
 (define-minor-mode org-autolist-mode
-  "Enables improved list management in org-mode."
-  nil " Autolist" nil
+  "Enables improved list management in `org-mode'."
+  :lighter " Autolist"
+  :keymap nil
   (cond
    ;; If enabling org-autolist-mode, then add our advice functions.
    (org-autolist-mode
