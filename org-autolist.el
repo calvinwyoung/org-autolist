@@ -5,7 +5,7 @@
 ;; Author: Calvin Young
 ;; Keywords: lists, checklists, org-mode
 ;; Homepage: https://github.com/calvinwyoung/org-autolist
-;; Version: 0.15
+;; Version: 0.16
 
 ;; This file is not part of GNU Emacs.
 
