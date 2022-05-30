@@ -125,9 +125,7 @@ automatically insert new list items.
     (if (and is-listitem
           (not
             (and org-return-follows-link
-                 (member (car (org-element-context))
-                         '( link citation footnote-reference citation-reference
-                            timestamp)))))
+              (eq 'org-link (get-text-property (point) 'face)))))
       ;; If we're at the beginning of an empty list item, then try to outdent
       ;; it. If it can't be outdented (b/c it's already at the outermost
       ;; indentation level), then delete it.
