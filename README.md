@@ -16,6 +16,15 @@ The latest stable version can be found in the [MELPA Stable](http://stable.melpa
 
 If you'd like the latest, potentially unstable version, you can also install org-autolist from the normal [MELPA](http://melpa.org/#/org-autolist) repository.
 
+### use-package
+
+Installing via [use-package](https://github.com/jwiegley/use-package) is easy:
+
+```el
+(use-package org-autolist
+  :hook (org-mode . org-autolist-mode))
+```
+
 ## Usage
 
 To enable org-autolist mode in the current buffer:
